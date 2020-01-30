@@ -1,6 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
+﻿using System.Collections.Generic;
 using System.Threading.Tasks;
 using Domain;
 using Microsoft.AspNetCore.Mvc;
@@ -12,6 +10,7 @@ using Persistent;
 namespace API.Controllers
 {
     [Route("api/[controller]")]
+    [ApiController]
     public class ValuesController : Controller
     {
         public ValuesController(DataContext context)

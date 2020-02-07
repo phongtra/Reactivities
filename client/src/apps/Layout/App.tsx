@@ -15,8 +15,19 @@ const App = () => {
   const handleSelectActivity = (id: string): void => {
     const select = activities.find(a => a.id === id);
     if (select) {
+      setEditMode(false);
       return setSelectedActivity(select);
     }
+  };
+  const handleCreateActivity = (activity: IActivity) => {
+    setActivities([...activities, activity]);
+    setSelectedActivity(activity);
+    setEditMode(false);
+  };
+  const handleEditActivity = (activity: IActivity) => {
+    setActivities([...activities.filter(a => a.id !== activity.id), activity]);
+    setSelectedActivity(activity);
+    setEditMode(false);
   };
   const handleOpenCreateForm = () => {
     setSelectedActivity(null);
@@ -27,11 +38,18 @@ const App = () => {
       const res = await axios.get<IActivity[]>(
         'http://localhost:5000/api/activities'
       );
-      setActivities(res.data);
+      let activities: IActivity[] = [];
+      res.data.forEach(activity => {
+        activity.date = activity.date.split('.')[0];
+        activities.push(activity);
+      });
+      setActivities(activities);
     };
     fetchData();
   }, []);
-
+  const handleDeleteActivity = (id: string) => {
+    setActivities([...activities.filter(a => a.id !== id)]);
+  };
   return (
     <>
       <NavBar openCreateForm={handleOpenCreateForm} />
@@ -43,6 +61,9 @@ const App = () => {
           selectActivity={handleSelectActivity}
           selectedActivity={selectedActivity}
           setSelectedActivity={setSelectedActivity}
+          createActivity={handleCreateActivity}
+          editActivity={handleEditActivity}
+          deleteActivity={handleDeleteActivity}
         />
       </Container>
     </>

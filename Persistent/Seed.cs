@@ -1,6 +1,6 @@
 ﻿using System;
 using Domain;
-using Microsoft.EntityFrameworkCore.Internal;
+using System.Linq;
 
 namespace Persistent
 {

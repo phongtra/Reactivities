@@ -1,7 +1,9 @@
 import { observable, action, computed, configure, runInAction } from 'mobx';
 import { createContext, SyntheticEvent } from 'react';
 import { IActivity } from '../Models/Activity';
+import { history } from '../..';
 import agent from '../api/agent';
+import { toast } from 'react-toastify';
 
 configure({ enforceActions: 'always' });
 
@@ -18,11 +20,11 @@ class ActivityStore {
 
   groupActivitiesDate(activities: IActivity[]) {
     const sortedActivities = activities.sort(
-      (a, b) => Date.parse(a.date) - Date.parse(b.date)
+      (a, b) => a.date.getTime() - b.date.getTime()
     );
     return Object.entries(
       sortedActivities.reduce((activities, activity) => {
-        const date = activity.date.split('T')[0];
+        const date = activity.date.toISOString().split('T')[0];
         activities[date] = activities[date]
           ? [...activities[date], activity]
           : [activity];
@@ -38,9 +40,11 @@ class ActivityStore {
       runInAction('create activity', () => {
         this.activityRegistry.set(activity.id, activity);
         this.submitting = false;
+        history.push(`/activities/${activity.id}`);
       });
     } catch (e) {
       runInAction('create activity error', () => {
+        toast.error('Problem submitting data');
         console.log(e);
         this.submitting = false;
       });
@@ -54,9 +58,11 @@ class ActivityStore {
         this.activityRegistry.set(activity.id, activity);
         this.activity = activity;
         this.submitting = false;
+        history.push(`/activities/${activity.id}`);
       });
     } catch (e) {
       runInAction('edit activity error', () => {
+        toast.error('Problem submitting data');
         this.submitting = false;
         console.log(e);
       });
@@ -90,7 +96,7 @@ class ActivityStore {
       const activities = await agent.Activities.list();
       runInAction('loading activities', () => {
         activities.forEach(activity => {
-          activity.date = activity.date.split('.')[0];
+          activity.date = new Date(activity.date);
           this.activityRegistry.set(activity.id, activity);
         });
         this.loadingInitial = false;
@@ -106,14 +112,18 @@ class ActivityStore {
     let activity = this.getActivity(id);
     if (activity) {
       this.activity = activity;
+      return activity;
     } else {
       this.loadingInitial = true;
       try {
         activity = await agent.Activities.detail(id);
         runInAction('get activity', () => {
+          activity.date = new Date(activity.date);
           this.activity = activity;
+          this.activityRegistry.set(activity.id, activity);
           this.loadingInitial = false;
         });
+        return activity;
       } catch (e) {
         runInAction('get activity error', () => {
           this.loadingInitial = false;

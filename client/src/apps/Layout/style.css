@@ -45,3 +45,8 @@ body {
 }
 
 /*end home page styles*/
+@-moz-document url-prefix() {
+  .fix-position-moz-DateTimePicker > div > input {
+    bottom: 8px !important;
+  }
+}

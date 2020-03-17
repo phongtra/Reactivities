@@ -10,8 +10,8 @@ import TextInput from '../../../apps/common/form/TextInput';
 import TextAreaInput from '../../../apps/common/form/TextAreaInput';
 import SelectInput from '../../../apps/common/form/SelectInput';
 import DateInput from '../../../apps/common/form/DateInput';
-import { category } from '../../../apps/common/options/Categories';
-import { combineDateAndTime } from '../../../apps/common/utils/utils';
+import { category } from '../../../apps/common/options/categoryOptions';
+import { combineDateAndTime } from '../../../apps/common/utils/util';
 import {
   combineValidators,
   isRequired,

@@ -37,27 +37,27 @@ namespace API.Middlewares
 
         private async Task HandleExceptionAsync(HttpContext context, Exception exception, ILogger<ErrorHandlingMiddleware> logger)
         {
-            object error = null;
+            object errors = null;
             switch (exception)
             {
                 case RestException re:
                     logger.LogError(exception, "REST Error");
-                    error = re.Errors;
+                    errors = re.Errors;
                     context.Response.StatusCode = (int) re.Code;
                     break;
                 case { } e:
                     logger.LogError(exception, "Server Error");
-                    error = string.IsNullOrWhiteSpace(e.Message) ? "Error" : e.Message;
+                    errors = string.IsNullOrWhiteSpace(e.Message) ? "Error" : e.Message;
                     context.Response.StatusCode = (int) HttpStatusCode.InternalServerError;
                     break;
             }
 
             context.Response.ContentType = "applications/json";
-            if (error != null)
+            if (errors != null)
             {
                 var result = JsonSerializer.Serialize(new
                 {
-                    error
+                    errors
                 });
                 await context.Response.WriteAsync(result);
             }

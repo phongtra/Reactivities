@@ -6,16 +6,16 @@ import { toast } from 'react-toastify';
 
 axios.defaults.baseURL = 'http://localhost:5000/api';
 axios.interceptors.request.use(
-  config => {
+  (config) => {
     const token = window.localStorage.getItem('jwt');
     if (token) config.headers.Authorization = `Bearer ${token}`;
     return config;
   },
-  error => {
+  (error) => {
     return Promise.reject(error);
   }
 );
-axios.interceptors.response.use(undefined, error => {
+axios.interceptors.response.use(undefined, (error) => {
   if (error.message === 'Network Error' && !error.response) {
     return toast.error('Network error - make sure API is running');
   }
@@ -37,32 +37,18 @@ axios.interceptors.response.use(undefined, error => {
 });
 
 const sleep = (ms: number) => (response: AxiosResponse) =>
-  new Promise<AxiosResponse>(resolve =>
+  new Promise<AxiosResponse>((resolve) =>
     setTimeout(() => resolve(response), ms)
   );
 
 const responseBody = (response: AxiosResponse) => response.data;
 const request = {
-  get: (url: string) =>
-    axios
-      .get(url)
-      .then(sleep(1000))
-      .then(responseBody),
+  get: (url: string) => axios.get(url).then(sleep(1000)).then(responseBody),
   post: (url: string, body: {}) =>
-    axios
-      .post(url, body)
-      .then(sleep(1000))
-      .then(responseBody),
+    axios.post(url, body).then(sleep(1000)).then(responseBody),
   put: (url: string, body: {}) =>
-    axios
-      .put(url, body)
-      .then(sleep(1000))
-      .then(responseBody),
-  del: (url: string) =>
-    axios
-      .delete(url)
-      .then(sleep(1000))
-      .then(responseBody)
+    axios.put(url, body).then(sleep(1000)).then(responseBody),
+  del: (url: string) => axios.delete(url).then(sleep(1000)).then(responseBody),
 };
 
 const Activities = {
@@ -71,7 +57,9 @@ const Activities = {
   create: (activity: IActivity) => request.post('/activities', activity),
   update: (activity: IActivity, id: string) =>
     request.put(`/activities/${id}`, activity),
-  delete: (id: string) => request.del(`/activities/${id}`)
+  delete: (id: string) => request.del(`/activities/${id}`),
+  attend: (id: string) => request.post(`/activities/${id}/attend`, {}),
+  unattend: (id: string) => request.del(`/activities/${id}/attend`),
 };
 
 const User = {
@@ -79,7 +67,7 @@ const User = {
   login: (user: IUserFormValues): Promise<IUser> =>
     request.post('user/login', user),
   register: (user: IUserFormValues): Promise<IUser> =>
-    request.post('user/register', user)
+    request.post('user/register', user),
 };
 
 export default { Activities, User };

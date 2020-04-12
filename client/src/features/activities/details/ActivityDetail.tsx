@@ -14,7 +14,7 @@ interface DetailProps {
 }
 
 const ActivityDetail: React.FC<RouteComponentProps<DetailProps>> = ({
-  match
+  match,
 }) => {
   const rootStore = useContext(RootStoreContext);
   const { activity, loadActivity, loadingInitial } = rootStore.activityStore;
@@ -35,7 +35,7 @@ const ActivityDetail: React.FC<RouteComponentProps<DetailProps>> = ({
         <ActivityDetailChat />
       </Grid.Column>
       <Grid.Column width={6}>
-        <ActivityDetailSidebar />
+        <ActivityDetailSidebar attendees={activity.attendees} />
       </Grid.Column>
     </Grid>
   );
